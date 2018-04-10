@@ -24,7 +24,7 @@ SPEED,      速度(km/h)：用户行程目前的速度
 CALLSTATE,  电话状态：用户行程目前的通话状态。（0,未知 1,呼出 2,呼入 3,连通 4,断连）
 Y           客户赔付率：客户赔付情况，为本次建模的目标Y值。（test中不含此字段）
 '''
-# data.TIME = data.TIME.map(lambda x:time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(x)))
+data.TIME = data.TIME.map(lambda x:time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(x)))
 
 #100个TERMINALNO，223个TRIP_ID
 # print(data.TERMINALNO.value_counts())
@@ -33,29 +33,19 @@ Y           客户赔付率：客户赔付情况，为本次建模的目标Y值�
 #初步思路：速度、加速度、时间变化图
 #某辆行程的加速度变化图
 
-# data.sort_values(by=['TERMINALNO','TRIP_ID','TIME'],ascending=[0,1,2],inplace=True)
+data.sort_values(by=['TERMINALNO','TRIP_ID','TIME'],ascending=[0,1,2],inplace=True)
 data = data[['TERMINALNO','TRIP_ID','TIME','SPEED']]
 # data = data[data['TERMINALNO'] == 1]
 time = data.TIME
 speed = data.SPEED
-controller = 100
-sep = (max(speed) - min(speed))/controller
-speedZone = []
 
-initSpeed = min(speed)
-for i in range(controller):
-    initSpeed += sep
-    speedZone.append(int(initSpeed))
-countSpeedZone = []
-for i in range(controller - 1):
-    countSpeedZone.append(len(data[(data.SPEED >= speedZone[i]) & (data.SPEED <= speedZone[i + 1])]))
-speedZone = speedZone[1:]
-plt.bar(speedZone,countSpeedZone,label = 'countsPerSpeedZone')
+
+# tmp = pd.DataFrame({u'time':time,u'speed':speed})
+plt.figure()
+plt.scatter(time, speed)
 plt.grid(True)
-# plt.xticks(speedZone)
-# plt.yticks(countSpeedZone)
-plt.xlabel('speedZone')
-plt.ylabel('counts')
-plt.title('countsPerSpeedZone')
+plt.xticks()
+plt.xlabel('time')
+plt.ylabel('speed')
+plt.title('time_speed')
 plt.show()
-
