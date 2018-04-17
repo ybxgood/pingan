@@ -10,7 +10,7 @@ from sklearn import preprocessing
 #转源数据为pkl文件
 # pd.read_csv("../PINGAN-2018-train_demo.csv",sep = ",").to_pickle("./PINGAN-2018-train_demo.pkl")
 data = pd.read_pickle("./PINGAN-2018-train_demo.pkl")
-data.drop_duplicates(inplace = True)#经查验无重复
+# data.drop_duplicates(inplace = True)#经查验无重复
 '''
 属性介绍：
 TERMINALNO, 用户id：用户唯一标志
@@ -23,39 +23,28 @@ HEIGHT,     海拔(m)：用户行程目前所处的海拔高度
 SPEED,      速度(km/h)：用户行程目前的速度
 CALLSTATE,  电话状态：用户行程目前的通话状态。（0,未知 1,呼出 2,呼入 3,连通 4,断连）
 Y           客户赔付率：客户赔付情况，为本次建模的目标Y值。（test中不含此字段）
-'''
-# data.TIME = data.TIME.map(lambda x:time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(x)))
+------------------------------------------------------------------------------
+老师的思路，分析以下数据：
+空间跨度
+最高、最低速度
+是否同一人开
+行驶里程
+行驶时间
+等特征，构建用户pic
 
+'''
 #100个TERMINALNO，223个TRIP_ID
-# print(data.TERMINALNO.value_counts())
-# print(data.TRIP_ID.value_counts())
+
+# 时间特征
+# 2016    69306
+# dtype: int64
+# 12    27890
+# 11    12884
+# 10    12287
+# 08     8208
+# 09     4316
+# 07     3721
+# dtype: int64
 
 #初步思路：速度、加速度、时间变化图
 #某辆行程的加速度变化图
-
-# data.sort_values(by=['TERMINALNO','TRIP_ID','TIME'],ascending=[0,1,2],inplace=True)
-data = data[['TERMINALNO','TRIP_ID','TIME','SPEED']]
-# data = data[data['TERMINALNO'] == 1]
-time = data.TIME
-speed = data.SPEED
-controller = 100
-sep = (max(speed) - min(speed))/controller
-speedZone = []
-
-initSpeed = min(speed)
-for i in range(controller):
-    initSpeed += sep
-    speedZone.append(int(initSpeed))
-countSpeedZone = []
-for i in range(controller - 1):
-    countSpeedZone.append(len(data[(data.SPEED >= speedZone[i]) & (data.SPEED <= speedZone[i + 1])]))
-speedZone = speedZone[1:]
-plt.bar(speedZone,countSpeedZone,label = 'countsPerSpeedZone')
-plt.grid(True)
-# plt.xticks(speedZone)
-# plt.yticks(countSpeedZone)
-plt.xlabel('speedZone')
-plt.ylabel('counts')
-plt.title('countsPerSpeedZone')
-plt.show()
-
